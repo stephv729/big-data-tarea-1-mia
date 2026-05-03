@@ -12,8 +12,9 @@ models:
       - name: gender
         tests:
           - accepted_values:
-              values: ['Male', 'Female']
-              quote: true
+              arguments:
+                values: ['Male', 'Female']
+                quote: true
 
   - name: stg_products
     description: "Productos limpios desde Airtable."
