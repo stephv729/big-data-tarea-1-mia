@@ -4,5 +4,5 @@ select
     store_id,
     store_name,
     city,
-    country
+    open_since
 from {{ ref('stg_stores') }}

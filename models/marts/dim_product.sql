@@ -4,5 +4,5 @@ select
     product_id,
     product_name,
     category,
-    price
+    brand
 from {{ ref('stg_products') }}

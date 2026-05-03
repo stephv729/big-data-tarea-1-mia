@@ -2,10 +2,11 @@
 
 select
     date_id,
-    full_date,
     day,
     month,
+    month_name,
     quarter,
     year,
-    day_of_week
+    weekday_name,
+    is_weekend
 from {{ ref('stg_dates') }}

@@ -17,7 +17,7 @@ sources:
   - name: airtable
     description: "Datos replicados desde Airtable via Fivetran (productos)."
     database: tarea-1-mia
-    schema: airtable_tarea_1_mia_apptrkcl   # TODO: reemplazar con nombre exacto del dataset
+    schema: airtable_tarea_1_mia_apptrkclc3ytfucpm
     tables:
       - name: product_dim
         description: "Dimension de productos - origen Airtable."

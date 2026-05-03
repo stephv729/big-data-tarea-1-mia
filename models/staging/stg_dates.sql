@@ -1,5 +1,3 @@
--- TODO: ajustar columnas segun el esquema real de date_dim_hoja_1.
-
 with source as (
 
     select *
@@ -9,12 +7,13 @@ with source as (
 )
 
 select
-    date_id,
-    cast(full_date as date) as full_date,
+    cast(date_id as date) as date_id,
     day,
     month,
+    month_name,
     quarter,
     year,
-    day_of_week,
+    weekday_name,
+    is_weekend,
     _fivetran_synced as _synced_at
 from source

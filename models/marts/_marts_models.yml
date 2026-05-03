@@ -26,27 +26,29 @@ models:
         tests: [unique, not_null]
 
   - name: fact_sales
-    description: "Tabla de hechos de ventas (grano = una venta)."
+    description: "Tabla de hechos de ventas. Grano = (date_id, product_id, customer_id, store_id)."
     columns:
-      - name: sale_id
-        tests: [unique, not_null]
-      - name: customer_id
-        tests:
-          - relationships:
-              to: ref('dim_customer')
-              field: customer_id
-      - name: product_id
-        tests:
-          - relationships:
-              to: ref('dim_product')
-              field: product_id
-      - name: store_id
-        tests:
-          - relationships:
-              to: ref('dim_store')
-              field: store_id
       - name: date_id
         tests:
+          - not_null
           - relationships:
               to: ref('dim_date')
               field: date_id
+      - name: product_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_product')
+              field: product_id
+      - name: customer_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_customer')
+              field: customer_id
+      - name: store_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_store')
+              field: store_id

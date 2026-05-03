@@ -1,5 +1,3 @@
--- TODO: ajustar columnas segun el esquema real de store_dim en Google Sheets.
-
 with source as (
 
     select *
@@ -12,6 +10,6 @@ select
     store_id,
     store_name,
     city,
-    country,
+    cast(open_since as date) as open_since,
     _fivetran_synced as _synced_at
 from source

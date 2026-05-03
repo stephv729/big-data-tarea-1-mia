@@ -1,5 +1,3 @@
--- TODO: ajustar columnas segun el esquema real de sales_fact_hoja_1.
-
 with source as (
 
     select *
@@ -9,12 +7,12 @@ with source as (
 )
 
 select
-    sale_id,
-    customer_id,
+    cast(date_id as date) as date_id,
     product_id,
+    customer_id,
     store_id,
-    date_id,
     quantity,
-    amount,
+    unit_price,
+    total_sales,
     _fivetran_synced as _synced_at
 from source
