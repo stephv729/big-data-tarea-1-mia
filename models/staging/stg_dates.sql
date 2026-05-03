@@ -2,7 +2,6 @@ with source as (
 
     select *
     from {{ source('gdrive', 'date_dim_hoja_1') }}
-    where coalesce(_fivetran_deleted, false) = false
 
 )
 

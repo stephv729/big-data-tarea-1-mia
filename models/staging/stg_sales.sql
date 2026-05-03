@@ -2,7 +2,6 @@ with source as (
 
     select *
     from {{ source('gdrive', 'sales_fact_hoja_1') }}
-    where coalesce(_fivetran_deleted, false) = false
 
 )
 
