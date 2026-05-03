@@ -1,86 +1,89 @@
 # big-data-tarea-1-mia
 
-Proyecto dbt para la tarea de Big Data - MIA.
+Tarea 1 - Modern BI - MIA. Plataforma de BI a baja escala con:
 
-## Arquitectura
+| Capa | Herramienta |
+|---|---|
+| Origenes | MySQL RDS (AWS), Airtable, Google Drive, Google Sheets |
+| Ingesta | Fivetran |
+| DWH | BigQuery (`tarea-1-mia`) |
+| Transformacion | dbt Cloud (este repo) |
+| Visualizacion | Power BI Desktop / Looker Studio |
+
+## Arquitectura del proyecto dbt
 
 ```
-fuentes RAW (Fivetran en BigQuery)  →  staging (views)  →  marts (tables)
+fuentes RAW (Fivetran)  →  staging (views)  →  marts/core (star schema)  →  marts/analytics (preguntas)
 ```
-
-| Capa | Dataset BigQuery | Materializacion | Proposito |
-|---|---|---|---|
-| Sources | `sales_datamart`, `airtable_*`, `google_sheets`, `google_drive` | (raw) | Datos crudos cargados por Fivetran |
-| Staging | `sales_datamart_dev_staging` | view | Limpieza, renombres, filtro de `_fivetran_deleted` |
-| Marts | `sales_datamart_dev_marts` | table | Modelo dimensional (star schema) |
-
-## Estructura
 
 ```
 models/
-├── staging/
+├── staging/                       (limpieza, snake_case, cast tipos)
 │   ├── _sources.yml
 │   ├── _stg_models.yml
-│   ├── stg_customers.sql      ← desde RDS MySQL
-│   ├── stg_products.sql       ← desde Airtable
-│   ├── stg_stores.sql         ← desde Google Sheets
-│   ├── stg_dates.sql          ← desde Google Drive
-│   └── stg_sales.sql          ← desde Google Drive (fact)
+│   ├── stg_customers.sql          ← RDS MySQL
+│   ├── stg_products.sql           ← Airtable
+│   ├── stg_stores.sql             ← Google Sheets
+│   ├── stg_dates.sql              ← Google Drive
+│   └── stg_sales.sql              ← Google Drive
 └── marts/
-    ├── _marts_models.yml
-    ├── dim_customer.sql
-    ├── dim_product.sql
-    ├── dim_store.sql
-    ├── dim_date.sql
-    └── fact_sales.sql
+    ├── core/                      (modelo dimensional reusable)
+    │   ├── _core_models.yml
+    │   ├── dim_customer.sql
+    │   ├── dim_product.sql
+    │   ├── dim_store.sql
+    │   ├── dim_date.sql
+    │   └── fact_sales.sql
+    └── analytics/                 (responde las 5 preguntas del PDF)
+        ├── _analytics_models.yml
+        ├── weekly_product_sales.sql        ← Q1 productos mas vendidos x semana
+        ├── top_customers.sql               ← Q2 cliente que compra mas
+        ├── product_trend_monthly.sql       ← Q3 productos en declive
+        ├── sales_over_time.sql             ← Q4 volumen vendido en el tiempo
+        └── customer_demographics.sql       ← Q5 distribucion edad/sexo/nacionalidad
 ```
 
-## Setup local
+## Mapping preguntas → modelo → grafico Power BI
+
+| # | Pregunta | Modelo a usar | Visualizacion sugerida |
+|---|---|---|---|
+| Q1 | Productos mas vendidos semana a semana | `weekly_product_sales` | Stacked bar / line chart con week_start en eje X, units_sold en Y, color por product_name |
+| Q2 | Cliente que compra mas | `top_customers` | Tabla ordenada por `total_spent desc` o bar chart top-10 |
+| Q3 | Productos cuya venta ha caido | `product_trend_monthly` | Line chart por producto + filtro `revenue_change_pct < 0` para destacar |
+| Q4 | Volumen vendido en el tiempo | `sales_over_time` | Line chart con eje temporal (sale_date / week_start / month_start) |
+| Q5 | Distribucion edad, sexo, nacionalidad | `customer_demographics` | 3 graficos: histograma de age_group, pie de gender, bar de nationality |
+
+## Datasets en BigQuery (post `dbt run`)
+
+Cada capa crea su propio dataset (el prefijo depende del target del profile):
+
+- `<target>_staging` → views de la capa staging
+- `<target>_marts_core` → tablas dim_* y fact_sales
+- `<target>_marts_analytics` → tablas que responden las 5 preguntas
+
+## Setup local (opcional - tambien funciona desde dbt Cloud IDE)
 
 ```bash
-# 1. Crear y activar virtualenv
 python3 -m venv .venv
 source .venv/bin/activate
-
-# 2. Instalar dbt-bigquery
 pip install dbt-bigquery
 
-# 3. Configurar credenciales de BigQuery
 gcloud auth application-default login
-
-# 4. Copiar el profile y ajustar
 mkdir -p ~/.dbt
-cp profiles.example.yml ~/.dbt/profiles.yml
-# (edita ~/.dbt/profiles.yml con tu dataset de desarrollo)
+cp profiles.example.yml ~/.dbt/profiles.yml   # ajustar dataset
 
-# 5. Verificar conexion
 dbt debug
-
-# 6. Correr todo
 dbt run
 dbt test
 ```
 
-## Uso en dbt Cloud
-
-Como este repo esta conectado a dbt Cloud, los models se ejecutan
-automaticamente segun los jobs configurados en la UI. La conexion a
-BigQuery se gestiona desde Account Settings → Projects → Connection.
-
 ## Comandos utiles
 
 ```bash
-dbt run --select staging              # solo staging
-dbt run --select marts                # solo marts
-dbt run --select +fact_sales          # fact_sales y todo lo upstream
-dbt test --select dim_customer        # tests de un model
-dbt docs generate && dbt docs serve   # documentacion interactiva
+dbt run --select staging          # solo staging
+dbt run --select marts.core       # solo star schema
+dbt run --select marts.analytics  # solo modelos de negocio
+dbt run --select +top_customers   # un modelo y todo upstream
+dbt test
+dbt docs generate && dbt docs serve
 ```
-
-## TODOs antes de correr
-
-1. Confirmar el nombre exacto del dataset Airtable en `models/staging/_sources.yml`
-   (linea con `airtable_tarea_1_mia_apptrkcl`).
-2. Validar columnas reales de cada tabla raw en BigQuery y ajustar los
-   `stg_*.sql` (productos, tiendas, fechas, ventas) si difieren.
-3. `dbt compile` ayuda a detectar columnas inexistentes antes de correr.

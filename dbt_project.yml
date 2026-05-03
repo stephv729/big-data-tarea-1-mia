@@ -21,5 +21,9 @@ models:
       +materialized: view
       +schema: staging
     marts:
-      +materialized: table
-      +schema: marts
+      core:
+        +materialized: table
+        +schema: marts_core
+      analytics:
+        +materialized: table
+        +schema: marts_analytics

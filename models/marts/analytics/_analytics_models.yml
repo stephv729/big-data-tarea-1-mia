@@ -1,0 +1,38 @@
+version: 2
+
+models:
+  - name: weekly_product_sales
+    description: |
+      Q1 - Productos mas vendidos semana a semana.
+      Una fila por (semana, producto). Filtrar por week_start y ordenar por
+      units_sold o revenue desc.
+
+  - name: top_customers
+    description: |
+      Q2 - Cliente que compra mas.
+      Una fila por cliente con metricas agregadas. Ordenar por total_spent desc.
+    columns:
+      - name: customer_id
+        tests: [unique, not_null]
+
+  - name: product_trend_monthly
+    description: |
+      Q3 - Productos cuya venta ha caido en el tiempo.
+      Tendencia mensual por producto con revenue_change_pct vs mes anterior
+      (negativo = caida).
+
+  - name: sales_over_time
+    description: |
+      Q4 - Variacion del volumen vendido en el tiempo.
+      Serie diaria con buckets de semana, mes, trimestre y flag weekend.
+    columns:
+      - name: sale_date
+        tests: [unique, not_null]
+
+  - name: customer_demographics
+    description: |
+      Q5 - Distribucion de edad, sexo y nacionalidad de los clientes,
+      enriquecida con sus metricas de compra (incluye clientes sin ventas).
+    columns:
+      - name: customer_id
+        tests: [unique, not_null]
