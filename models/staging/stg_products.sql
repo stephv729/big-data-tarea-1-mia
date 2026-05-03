@@ -2,7 +2,6 @@ with source as (
 
     select *
     from {{ source('airtable', 'product_dim') }}
-    where coalesce(_fivetran_deleted, false) = false
 
 )
 
