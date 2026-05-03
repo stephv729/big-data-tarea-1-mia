@@ -1,0 +1,15 @@
+# Copia este archivo a ~/.dbt/profiles.yml y ajusta los valores.
+# NO lo commitees con credenciales reales (ya esta en .gitignore).
+
+tarea_1_mia:
+  target: dev
+  outputs:
+    dev:
+      type: bigquery
+      method: oauth
+      project: tarea-1-mia
+      dataset: sales_datamart_dev
+      threads: 4
+      location: US
+      timeout_seconds: 300
+      priority: interactive

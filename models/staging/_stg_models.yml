@@ -1,0 +1,40 @@
+version: 2
+
+models:
+  - name: stg_customers
+    description: "Clientes limpios desde RDS MySQL."
+    columns:
+      - name: customer_id
+        description: "PK del cliente."
+        tests: [unique, not_null]
+      - name: customer_name
+        tests: [not_null]
+      - name: gender
+        tests:
+          - accepted_values:
+              values: ['Male', 'Female']
+              quote: true
+
+  - name: stg_products
+    description: "Productos limpios desde Airtable."
+    columns:
+      - name: product_id
+        tests: [unique, not_null]
+
+  - name: stg_stores
+    description: "Tiendas limpias desde Google Sheets."
+    columns:
+      - name: store_id
+        tests: [unique, not_null]
+
+  - name: stg_dates
+    description: "Dimension de fechas limpia."
+    columns:
+      - name: date_id
+        tests: [unique, not_null]
+
+  - name: stg_sales
+    description: "Hechos de ventas limpios."
+    columns:
+      - name: sale_id
+        tests: [unique, not_null]

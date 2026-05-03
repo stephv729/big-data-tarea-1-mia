@@ -1,0 +1,41 @@
+version: 2
+
+# IMPORTANTE: confirma los nombres exactos de los datasets en BigQuery.
+# Los marcados con TODO estan truncados en el screenshot - verifica en
+# BigQuery Studio (panel izquierdo bajo el proyecto tarea-1-mia).
+
+sources:
+
+  - name: rds_mysql
+    description: "Datos replicados desde MySQL RDS via Fivetran (customer)."
+    database: tarea-1-mia
+    schema: sales_datamart
+    tables:
+      - name: customer_dim
+        description: "Dimension de clientes - origen RDS MySQL."
+
+  - name: airtable
+    description: "Datos replicados desde Airtable via Fivetran (productos)."
+    database: tarea-1-mia
+    schema: airtable_tarea_1_mia_apptrkcl   # TODO: reemplazar con nombre exacto del dataset
+    tables:
+      - name: product_dim
+        description: "Dimension de productos - origen Airtable."
+
+  - name: gsheets
+    description: "Datos desde Google Sheets via Fivetran."
+    database: tarea-1-mia
+    schema: google_sheets
+    tables:
+      - name: store_dim
+        description: "Dimension de tiendas - origen Google Sheets."
+
+  - name: gdrive
+    description: "Datos desde Google Drive (Excel) via Fivetran."
+    database: tarea-1-mia
+    schema: google_drive
+    tables:
+      - name: date_dim_hoja_1
+        description: "Dimension de fechas."
+      - name: sales_fact_hoja_1
+        description: "Hechos de ventas."
